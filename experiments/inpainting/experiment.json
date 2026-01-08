@@ -1,0 +1,16 @@
+{
+  "name": "inpainting",
+  "data_yaml": "data/combined/inpainting/data.yaml",
+  "config": {
+    "model": "yolov8m.pt",
+    "epochs": 100,
+    "imgsz": 512,
+    "batch": 8,
+    "device": "mps",
+    "patience": 20,
+    "save_period": 10,
+    "workers": 4,
+    "augment": true
+  },
+  "timestamp": "2026-01-06T15:24:34.763861"
+}

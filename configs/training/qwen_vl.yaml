@@ -1,0 +1,62 @@
+# Qwen2-VL Fine-tuning Configuration for Defect Detection
+
+model:
+  name: "Qwen/Qwen2-VL-2B-Instruct"  # Smallest model for MPS
+  trust_remote_code: true
+  torch_dtype: "float32"  # MPS doesn't support bf16 well
+  device_map: "mps"
+
+lora:
+  r: 8
+  alpha: 16
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+  dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+training:
+  output_dir: "models/qwen_vl"
+  num_train_epochs: 3
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 2e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  lr_scheduler_type: "cosine"
+  logging_steps: 10
+  save_steps: 100
+  save_total_limit: 2
+  fp16: false  # MPS doesn't support fp16 training well
+  bf16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  dataloader_num_workers: 0  # MPS works better with 0
+  remove_unused_columns: false
+
+data:
+  max_length: 1024
+  image_size: 448  # Qwen2-VL default
+
+dataset:
+  name: "Cable"
+  defect_types:
+    - "break"
+    - "thunderbolt"
+  task_type: "detection"
+
+prompts:
+  system: |
+    You are an expert industrial quality inspector. Analyze images for defects and provide precise bounding box coordinates.
+
+  user_template: |
+    Analyze this industrial cable image for defects.
+    Identify all defects of types: break, thunderbolt.
+    For each defect, provide the bounding box as normalized coordinates [x1, y1, x2, y2] where values are 0.0 to 1.0.
+    Respond in JSON format: {"defects": [{"label": "type", "bbox": [x1, y1, x2, y2], "confidence": 0.95}]}
+
+  assistant_template: |
+    {"defects": [{defects}]}

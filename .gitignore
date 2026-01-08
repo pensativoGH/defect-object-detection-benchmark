@@ -1,0 +1,49 @@
+# Data and models (large files)
+data/
+models/
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# Experiment outputs (large files)
+experiments/*/weights/
+experiments/*/*.log
+experiments/inference_results/
+
+# Keep only results.csv from experiments
+!experiments/*/results.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+wandb/
+
+# Temporary files
+*.tmp
+*.temp

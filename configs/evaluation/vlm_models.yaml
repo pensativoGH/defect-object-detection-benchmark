@@ -1,0 +1,81 @@
+# VLM Models Configuration for OpenRouter
+# https://openrouter.ai/docs
+
+api:
+  base_url: "https://openrouter.ai/api/v1"
+  timeout_seconds: 120
+  max_retries: 3
+  retry_delay_seconds: 2
+
+models:
+  gemini-2.0-flash:
+    openrouter_id: "google/gemini-2.0-flash-001"
+    display_name: "Gemini 2.0 Flash"
+    provider: "Google"
+    max_tokens: 4096
+    supports_vision: true
+    cost_per_1k_input: 0.0001
+    cost_per_1k_output: 0.0004
+
+  gemini-2.5-pro:
+    openrouter_id: "google/gemini-2.5-pro-preview-06-05"
+    display_name: "Gemini 2.5 Pro"
+    provider: "Google"
+    max_tokens: 4096
+    supports_vision: true
+    cost_per_1k_input: 0.00125
+    cost_per_1k_output: 0.005
+
+  gpt-4o:
+    openrouter_id: "openai/gpt-4o"
+    display_name: "GPT-4o"
+    provider: "OpenAI"
+    max_tokens: 4096
+    supports_vision: true
+    cost_per_1k_input: 0.005
+    cost_per_1k_output: 0.015
+
+# Rate limiting per model (requests per minute)
+rate_limits:
+  default: 60
+  gemini-2.0-flash: 120
+  gemini-2.5-pro: 60
+  gpt-4o: 60
+
+# Dataset configuration
+dataset:
+  name: "Cable"
+  product_type: "electrical cable"
+  defect_types:
+    - "break"
+    - "thunderbolt"
+  task_type: "detection"
+
+# Prompts
+prompts:
+  system: |
+    You are an expert industrial quality inspector specializing in defect detection.
+    You analyze images with precision and provide accurate bounding box coordinates for any defects found.
+    Always respond in the exact JSON format requested.
+
+  zero_shot: |
+    Analyze this industrial inspection image of an electrical cable.
+    Identify and locate ALL defects present. The possible defect types are: break, thunderbolt.
+
+    For each defect found, provide:
+    1. The defect type (must be one of: break, thunderbolt)
+    2. Bounding box as normalized coordinates [x1, y1, x2, y2] where values are 0.0 to 1.0
+    3. Your confidence level (0.0 to 1.0)
+
+    Respond ONLY with valid JSON in this exact format:
+    {"defects": [{"label": "defect_type", "bbox": [x1, y1, x2, y2], "confidence": 0.95}]}
+
+    If no defects are found, respond with:
+    {"defects": []}
+
+  few_shot_prefix: |
+    You are analyzing industrial cable images for defects. Here are examples of defects:
+
+  few_shot_suffix: |
+    Now analyze the following new image and identify any defects.
+    Respond ONLY with valid JSON: {"defects": [{"label": "type", "bbox": [x1,y1,x2,y2], "confidence": 0.95}]}
